@@ -1,5 +1,5 @@
-import { FacebookAuthProvider, getAuth, GithubAuthProvider, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { useState } from "react";
+import { FacebookAuthProvider, getAuth, GithubAuthProvider, GoogleAuthProvider, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { useEffect, useState } from "react";
 import app from "../../firebase.init";
 
 const auth = getAuth(app);
@@ -15,6 +15,7 @@ const useFirebase = () => {
     signInWithPopup(auth, googleProvider)
       .then((result) => {
         setUser(result.user);
+        console.log(result.user);
       })
       .catch((error) => {
         console.log(error);
@@ -38,7 +39,16 @@ const useFirebase = () => {
     });
       
   }
-  return { user, handleGoogle,handleFacebook ,handleGithub};
+  useEffect(()=>{
+    onAuthStateChanged(auth,user=>{
+      setUser(user)
+    })
+  },[])
+  const logOut=()=>{
+    signOut(auth)
+    .then(()=>{})
+  }
+  return { user,logOut, handleGoogle,handleFacebook ,handleGithub};
 };
 
 export default useFirebase;
